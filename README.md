@@ -1,50 +1,32 @@
-# HSELY — paquet de modifications
+# React + TypeScript + Vite
 
-Ce paquet contient le prompt et les fichiers prêts à intégrer au dépôt HSELY.
+This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
-## Contenu
+Currently, two official plugins are available:
 
-| Fichier | Rôle |
-|---|---|
-| `PROMPT-COPILOT.md` | Prompt complet à donner à GitHub Copilot |
-| `capacitor.config.ts` | App ID `com.hsely.app`, nom **HSELY** |
-| `.github/workflows/android-apk.yml` | Workflow + job `apk` (artifact `hsely-debug-apk`) |
-| `scripts/patch-android.mjs` | Permissions GPS du manifeste Android |
-| `supabase/PHOTOS.sql` | Colonnes photos / état / GPS + RPC 10 paramètres |
-| `worker/` | Worker Cloudflare `hsely-photos` + binding R2 |
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## Application
+## React Compiler
 
-Le nom de l'application est **HSELY**. Aucune mention « Douches » dans le nom,
-les titres, les métadonnées ou la marque. Les libellés techniques du formulaire
-et les noms de tables/colonnes Supabase restent inchangés (contrat de données).
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## Mise en service
+## Expanding the Oxlint configuration
 
-1. Copier les fichiers dans le dépôt (ou laisser Copilot appliquer le prompt).
-2. Exécuter `supabase/PHOTOS.sql` dans **Supabase → SQL Editor**.
-3. Créer le bucket et le Worker :
+If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
 
-```bash
-cd worker
-npx wrangler login
-npx wrangler r2 bucket create hsely-photos
-npx wrangler secret put APP_TOKEN
-npx wrangler deploy
+```json
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc"],
+  "options": {
+    "typeAware": true
+  },
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+  }
+}
 ```
 
-4. Dans Netlify / GitHub Actions, renseigner :
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
-   - `VITE_PHOTOS_ENDPOINT` (`https://hsely-photos.<compte>.workers.dev`)
-   - `VITE_PHOTOS_TOKEN` (même valeur que `APP_TOKEN`)
-5. Pousser sur `main` : le workflow **Android APK** produit l'artefact
-   `hsely-debug-apk`.
-
-## CORS
-
-Pour que les photos partent aussi depuis l'APK :
-
-```toml
-ALLOWED_ORIGIN = "https://votre-site.netlify.app,https://localhost"
-```
+See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
